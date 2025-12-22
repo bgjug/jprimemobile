@@ -7,16 +7,18 @@ import 'package:jprimemobile/presentation/widgets/session_card.dart';
 
 class HallSessionsScreen extends StatelessWidget {
   final String hallName;
+  final DateTime? selectedDate;
 
   const HallSessionsScreen({
     super.key,
     required this.hallName,
+    this.selectedDate,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<SessionsCubit>()..loadSessions(hallName),
+      create: (context) => getIt<SessionsCubit>()..loadSessions(hallName, date: selectedDate),
       child: BlocBuilder<SessionsCubit, SessionsState>(
         builder: (context, state) {
           return state.when(
@@ -51,7 +53,7 @@ class HallSessionsScreen extends StatelessWidget {
 
               return RefreshIndicator(
                 onRefresh: () async {
-                  await context.read<SessionsCubit>().loadSessions(hallName);
+                  await context.read<SessionsCubit>().loadSessions(hallName, date: selectedDate);
                 },
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -99,7 +101,7 @@ class HallSessionsScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<SessionsCubit>().loadSessions(hallName);
+                      context.read<SessionsCubit>().loadSessions(hallName, date: selectedDate);
                     },
                     child: const Text('Retry'),
                   ),
