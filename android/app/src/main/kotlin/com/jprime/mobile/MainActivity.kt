@@ -1,4 +1,4 @@
-package com.example.jprimemobile
+package com.jprime.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

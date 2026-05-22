@@ -21,10 +21,12 @@ class SessionsCubit extends Cubit<SessionsState> {
   SessionsCubit(this._repository) : super(const SessionsState.initial());
 
   Future<void> loadSessions(String hallName, {DateTime? date}) async {
+    if (isClosed) return;
     emit(const SessionsState.loading());
     final result = date != null
         ? await _repository.getSessionsByHallAndDate(hallName, date)
         : await _repository.getSessionsByHall(hallName);
+    if (isClosed) return;
     result.fold(
       (error) => emit(SessionsState.error(error)),
       (sessions) => emit(SessionsState.loaded(sessions)),

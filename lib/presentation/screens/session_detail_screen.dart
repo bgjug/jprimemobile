@@ -13,6 +13,23 @@ class SessionDetailScreen extends StatelessWidget {
     required this.session,
   });
 
+  bool _isRealTalk(String title) {
+    final nonTalkKeywords = [
+      'break',
+      'breakfast',
+      'opening',
+      'lunch',
+      'coffee',
+      'closing',
+      'registration',
+      'beer and networking',
+      'raffle',
+    ];
+
+    final lowerTitle = title.toLowerCase();
+    return !nonTalkKeywords.any((keyword) => lowerTitle.contains(keyword));
+  }
+
   @override
   Widget build(BuildContext context) {
     final timeFormat = DateFormat('HH:mm');
@@ -25,20 +42,22 @@ class SessionDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Session Details'),
         actions: [
-          BlocBuilder<FavoritesCubit, FavoritesState>(
-            builder: (context, state) {
-              final isFavorite = state.favoriteIds.contains(session.id);
-              return IconButton(
-                icon: Icon(
-                  isFavorite ? Icons.star : Icons.star_border,
-                  color: isFavorite ? AppTheme.accentPurple : Colors.white,
-                ),
-                onPressed: () {
-                  context.read<FavoritesCubit>().toggleFavorite(session.id);
-                },
-              );
-            },
-          ),
+          // Only show favorite icon for real talks
+          if (_isRealTalk(session.title))
+            BlocBuilder<FavoritesCubit, FavoritesState>(
+              builder: (context, state) {
+                final isFavorite = state.favoriteIds.contains(session.id);
+                return IconButton(
+                  icon: Icon(
+                    isFavorite ? Icons.star : Icons.star_border,
+                    color: isFavorite ? AppTheme.accentPurple : Colors.white,
+                  ),
+                  onPressed: () {
+                    context.read<FavoritesCubit>().toggleFavorite(session.id);
+                  },
+                );
+              },
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -166,7 +185,7 @@ class SessionDetailScreen extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Details for this session will be announced soon.',
+                          'No details for this session as of right now.',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ),

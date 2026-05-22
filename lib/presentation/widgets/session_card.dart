@@ -4,16 +4,38 @@ import 'package:intl/intl.dart';
 import 'package:jprimemobile/core/theme/app_theme.dart';
 import 'package:jprimemobile/data/models/session.dart';
 import 'package:jprimemobile/presentation/cubits/favorites_cubit.dart';
+import 'package:jprimemobile/presentation/widgets/current_time_indicator.dart';
+
+enum TimeIndicatorPosition { start, middle, end }
 
 class SessionCard extends StatelessWidget {
   final Session session;
   final VoidCallback? onTap;
+  final TimeIndicatorPosition? showTimeIndicator;
 
   const SessionCard({
     super.key,
     required this.session,
     this.onTap,
+    this.showTimeIndicator,
   });
+
+  bool _isRealTalk(String title) {
+    final nonTalkKeywords = [
+      'break',
+      'breakfast',
+      'opening',
+      'lunch',
+      'coffee',
+      'closing',
+      'registration',
+      'beer and networking',
+      'raffle',
+    ];
+
+    final lowerTitle = title.toLowerCase();
+    return !nonTalkKeywords.any((keyword) => lowerTitle.contains(keyword));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +53,12 @@ class SessionCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Show indicator at start if needed
+              if (showTimeIndicator == TimeIndicatorPosition.start)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: CurrentTimeIndicator(),
+                ),
               Row(
                 children: [
                   Expanded(
@@ -41,22 +69,24 @@ class SessionCard extends StatelessWidget {
                           ),
                     ),
                   ),
-                  BlocBuilder<FavoritesCubit, FavoritesState>(
-                    builder: (context, state) {
-                      final isFavorite = state.favoriteIds.contains(session.id);
-                      return IconButton(
-                        icon: Icon(
-                          isFavorite ? Icons.star : Icons.star_border,
-                          color: isFavorite
-                              ? AppTheme.accentPurple
-                              : Colors.white60,
-                        ),
-                        onPressed: () {
-                          context.read<FavoritesCubit>().toggleFavorite(session.id);
-                        },
-                      );
-                    },
-                  ),
+                  // Only show favorite icon for real talks
+                  if (_isRealTalk(session.title))
+                    BlocBuilder<FavoritesCubit, FavoritesState>(
+                      builder: (context, state) {
+                        final isFavorite = state.favoriteIds.contains(session.id);
+                        return IconButton(
+                          icon: Icon(
+                            isFavorite ? Icons.star : Icons.star_border,
+                            color: isFavorite
+                                ? AppTheme.accentPurple
+                                : Colors.white60,
+                          ),
+                          onPressed: () {
+                            context.read<FavoritesCubit>().toggleFavorite(session.id);
+                          },
+                        );
+                      },
+                    ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -85,6 +115,12 @@ class SessionCard extends StatelessWidget {
                   ),
                 ],
               ),
+              // Show indicator in middle if needed
+              if (showTimeIndicator == TimeIndicatorPosition.middle)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: CurrentTimeIndicator(),
+                ),
               if (session.lectorName != null) ...[
                 const SizedBox(height: 8),
                 Row(
@@ -113,6 +149,12 @@ class SessionCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
+              // Show indicator at end if needed
+              if (showTimeIndicator == TimeIndicatorPosition.end)
+                const Padding(
+                  padding: EdgeInsets.only(top: 8),
+                  child: CurrentTimeIndicator(),
+                ),
             ],
           ),
         ),

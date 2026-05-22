@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       _NavigationTab(
-        label: 'Workshops',
+        label: 'Workshops & Deep dives',
         icon: Icons.school,
         screen: HallSessionsScreen(
           hallName: 'workshops',
@@ -97,7 +97,9 @@ class _HomeScreenState extends State<HomeScreen> {
       _NavigationTab(
         label: 'Favorites',
         icon: Icons.star,
-        screen: const FavoritesScreen(),
+        screen: FavoritesScreen(
+          selectedDate: _selectedDate,
+        ),
       ),
     ];
   }
